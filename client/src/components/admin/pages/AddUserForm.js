@@ -1,23 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import { toast } from 'react-toastify';
 
-const AdminEditForm = ({ user, onClose, profilePicture }) => {
+
+const AddUserForm = ({ onClose }) => {
+  const [successMessage, setSuccessMessage] = useState('');
+
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
     email: "",
-    role: "",
+    role: "user", // Default role is "user"
   });
-
-  useEffect(() => {
-    // Populate form data with user details when component mounts
-    setFormData({
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
-      role: user.role,
-    });
-  }, [user]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,24 +20,17 @@ const AdminEditForm = ({ user, onClose, profilePicture }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Compare the form data with the user's original data
-    const updatedData = {};
-    for (const key in formData) {
-      if (formData[key] !== user[key]) {
-        updatedData[key] = formData[key];
-      }
-    }
-
-    updatedData.userId = user._id;
-    console.log(updatedData.userId);
-
-    // Submit the updated data to the backend
     try {
-      // Make an API call to update user data with updatedData
-      const response = await axios.put(`/api/v1/admin/users`, updatedData);
-      console.log("Updated data:", response.data);
+      // Make an API call to create a new user with formData
+      const response = await axios.post(`/api/v1/admin/register`, formData);
+      toast.success('Registration successful.');
+      setSuccessMessage('Registration successful. Please check your email to verify your account before logging in.');
+      console.log("New user created:", response.data);
+
+      // Close the form after successful submission
+      onClose();
     } catch (error) {
-      console.error("Error updating user:", error);
+      console.error("Error adding user:", error);
     }
   };
 
@@ -56,8 +43,8 @@ const AdminEditForm = ({ user, onClose, profilePicture }) => {
       <div className="bg-white w-full md:w-3/4 max-w-md rounded-lg shadow-md p-6">
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4  text-gray-400 hover:text-gray-700 focus:outline-none"
-          style={{ top: "3rem", right: "29rem" }}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 focus:outline-none"
+          style={{ top: "8rem", right: "29rem" }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -66,61 +53,13 @@ const AdminEditForm = ({ user, onClose, profilePicture }) => {
             viewBox="0 0 20 20"
             stroke="currentColor"
           >
-            <circle
-              cx="10"
-              cy="10"
-              r="9"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-            <line
-              x1="6"
-              y1="6"
-              x2="14"
-              y2="14"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <line
-              x1="6"
-              y1="14"
-              x2="14"
-              y2="6"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
+            <circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
+            <line x1="6" y1="6" x2="14" y2="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <line x1="6" y1="14" x2="14" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
         </button>
-        <div className="flex justify-center">
-          {profilePicture ? (
-            <img
-              src={profilePicture}
-              alt="Profile"
-              className="w-32 h-32 rounded-full mb-4"
-            />
-          ) : (
-            <div className="w-32 h-32 flex items-center justify-center bg-gray-200 rounded-full mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-16 h-16 text-gray-400"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-            </div>
-          )}
-        </div>
         <form onSubmit={handleSubmit}>
+        {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
           <div className="mb-4">
             <label htmlFor="firstname" className="block font-medium mb-1">
               First Name:
@@ -164,20 +103,22 @@ const AdminEditForm = ({ user, onClose, profilePicture }) => {
             <label htmlFor="role" className="block font-medium mb-1">
               Role:
             </label>
-            <input
+            <select
               id="role"
               name="role"
               value={formData.role}
               onChange={handleChange}
               className="border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm"
-              disabled
-            />
+            >
+              <option value="user">user</option>
+              <option value="admin">admin</option>
+            </select>
           </div>
           <button
             type="submit"
             className="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600"
           >
-            Update
+            Add User
           </button>
         </form>
       </div>
@@ -185,4 +126,4 @@ const AdminEditForm = ({ user, onClose, profilePicture }) => {
   );
 };
 
-export default AdminEditForm;
+export default AddUserForm;

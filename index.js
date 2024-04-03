@@ -42,14 +42,7 @@ app.use("/api/v1/admin/", adminRoutes);
 app.use("/api/v1/", addressRoutes);
 app.use("/api/v1/", pictureRoutes);
 
-io.on("connection", (socket) => {
-  console.log("New client connected");
 
-  // Handle user disconnect
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-  });
-});
 
 const PORT = process.env.PORT || 3000;
 
@@ -60,4 +53,5 @@ app.get("/", (req, res) => {
 server.listen(PORT, (req, res) => {
   console.log(`server started on ${PORT}`.bgCyan.white);
 });
+
 export {io}

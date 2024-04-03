@@ -9,8 +9,6 @@ import bcrypt from "bcrypt";
 import { validationResult } from "express-validator";
 import { io } from "../index.js";
 
-
-
 dotenv.config();
 
 var transporter = nodemailer.createTransport({
@@ -162,14 +160,14 @@ export const loginController = async (req, res, next) => {
       });
     }
     user.loggedIn = true;
-    await user.save()
+    await user.save();
 
     const { password: pass, ...rest } = user._doc;
     res.cookie("Bearer", token).status(201).json(rest);
 
-    io.emit('userStatusUpdate', { userId: user._id, status: true });
-    console.log('User status update emitted:', {user, status: 'active' });
-    } catch (error) {
+    io.emit("userStatusUpdate", { userId: user._id, status: true });
+    console.log("User status update emitted:", { user, status: "active" });
+  } catch (error) {
     next(error);
   }
 };
@@ -265,7 +263,7 @@ export const resetPassword = async (req, res) => {
     await user.save();
 
     // Send success response
-    res.status(200).send({ message: "Password updated" });
+    res.status(200).send({ message: "Password updated" ,role: user.role});
   } catch (err) {
     // Send error response if any error occurs
     res.status(500).send({ message: err.message });
@@ -284,9 +282,8 @@ export const logout = async (req, res, next) => {
     user.loggedIn = false;
     await user.save();
 
-    io.emit('userStatusUpdate',{userId, status: false })
-    console.log('User status update emitted:', {user, status: 'inactive' });
-
+    io.emit("userStatusUpdate", { userId, status: false });
+    console.log("User status update emitted:", { user, status: "inactive" });
 
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {

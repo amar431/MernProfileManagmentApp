@@ -22,7 +22,11 @@ const ResetPasswordPage = () => {
         { newPassword, confirmPassword }
       );
       setSuccessMessage(response.data.message);
-      navigate("/login");
+      if (response.data.role === 'admin') {
+        navigate("/admin/login");
+      } else {
+        navigate("/login");
+      }
     } catch (error) {
       console.log(error.response.data);
       if (

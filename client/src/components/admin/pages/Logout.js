@@ -1,20 +1,19 @@
 import React from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { authFailure } from "../../redux/user/userSlice";
+import { adminAuthFailure } from "../../../redux/admin/adminSlice";
 import { useNavigate } from "react-router-dom";
 const Logout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const userId = useSelector((state) => state.user.userProfile._id);
+  const userId = useSelector((state) => state.admin?.adminProfile?._id);
 
   // Assuming you have stored the user ID in your Redux store
   const handleLogout = async () => {
     try {
-      await axios.post("/api/v1/auth/logout", { userId });
-      localStorage.removeItem("token");
-      dispatch(authFailure());
-      navigate("/login");
+      await axios.post("/api/v1/admin/logout", { userId });
+      dispatch(adminAuthFailure());
+      navigate("/admin/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
